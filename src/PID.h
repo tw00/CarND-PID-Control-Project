@@ -2,6 +2,7 @@
 #define PID_H
 
 #include <vector>
+#include <ctime>
 
 class PID {
 public:
@@ -45,6 +46,11 @@ public:
   double TotalError();
 
   /*
+  * returns time in seconds since last reset
+  */
+  double get_tuning_time( bool reset_clock );
+
+  /*
   * tune PID parameters
   */
   void setup_tune();
@@ -54,11 +60,14 @@ private:
   /* last cte */
   double prev_cte;
 
+  /* sum of cte */
+  double cte_sum;
+
   /* total error */
-  double err_sum;
+  double cte_square_sum;
 
   /* last update */
-  std::chrono::milliseconds time_last_update;
+  std::chrono::high_resolution_clock::time_point time_last_update;
 
   /* tuning variables */
   unsigned int tune_current_param;
@@ -69,7 +78,7 @@ private:
   std::vector<double> tune_dp;
   std::vector<double> tune_p;
   std::vector<double> tune_p_best;
-  std::chrono::milliseconds tuning_start_time;
+  std::chrono::high_resolution_clock::time_point tuning_start_time;
 };
 
 #endif /* PID_H */

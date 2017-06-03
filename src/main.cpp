@@ -33,15 +33,16 @@ int main()
   uWS::Hub h;
 
   PID pid;
-  bool tuning_done = false;
-  // Initialize the pid variable.
-  // pid.Init(0.1, 0.001, 0.0);
-  // pid.Init(0.1, 0.0001, 0.9);
-  // pid.Init(0.1, 0.0001/5e-5, 0.9*5e-5);
-  pid.Init(0.1, 20, 4.5e-5);
-  pid.setup_tune();
+  bool enable_tuning = false;
+  bool tuning_done   = false;
+  bool start_tuning  = false;
 
-  h.onMessage([&pid,&tuning_done](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  // Initialize the pid variable.
+  pid.Init(0.27528, 0.19602, 0.121 );
+
+  pid.setup_tune();
+  
+  h.onMessage([&pid,&enable_tuning,&tuning_done,&start_tuning](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -53,7 +54,7 @@ int main()
         auto j = json::parse(s);
         std::string event = j[0].get<std::string>();
         if (event == "telemetry") {
-          // j[1] is the data JSON o7bject
+          // j[1] is the data JSON object
           double cte = std::stod(j[1]["cte"].get<std::string>());
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
@@ -69,23 +70,23 @@ int main()
           // DEBUG
           if( debug ) std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
           
-          if( fabs(cte) > 2.0 ) {
+          if( enable_tuning && (fabs(cte) > 2.5 || pid.get_tuning_time(false) > 45.0 ) ) {
             // Reset 
             std::string reset_msg = "42[\"reset\",{}]";
             ws.send(reset_msg.data(), reset_msg.length(), uWS::OpCode::TEXT);
 
-            // pid.Init(0.1, 20, 4.5e-5); // TODO TUNE
-            if( pid.tune() ) tuning_done = true;
+            // call runing algorithm
+            if( start_tuning && pid.tune() ) tuning_done = true;
+            start_tuning = true;
           }
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          if( tuning_done ) {
-            msgJson["throttle"] = 0.78;
+          if( enable_tuning  ) {
+            msgJson["throttle"] = 0.50;
           } else {
-            msgJson["throttle"] = 0.75;
+            msgJson["throttle"] = 0.45;
           }
-          //msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           if( debug ) std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
