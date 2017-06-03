@@ -26,7 +26,7 @@ guess by playing around with the parameters individually.
 
 For further optimization, a tuning algorithm is implemented. Therefore, I defined an error that measures how good/how bad the controller is performing:
 
-  err = sum( e(t) ^ 2 ) )/ tuning_time ^ 1.5
+  err = sum( e(t) ^ 2 ) ) / tuning_time ^ 1.5
 
 where tuning_time is the time since the simulation started. Diving by the tuning time normalizes the sum of the squared error. Additionally longer driving is rewarded by dividing with tuning_time ^ 1.5.
 
@@ -40,3 +40,8 @@ By altering each parameter individually and checking if an overall error is redu
 finds better parameters. 
 
 I ended up with Kp = 0.27528, Ki = 0.19602, Kd = 0.121
+
+## Results
+
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/O9qLPyIZckI" frameborder="0" allowfullscreen></iframe>
