@@ -43,5 +43,4 @@ I ended up with Kp = 0.27528, Ki = 0.19602, Kd = 0.121
 
 ## Results
 
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/O9qLPyIZckI" frameborder="0" allowfullscreen></iframe>
+[![Video Car](https://img.youtube.com/vi/O9qLPyIZckI/0.jpg)](http://www.youtube.com/watch?v=O9qLPyIZckI)
